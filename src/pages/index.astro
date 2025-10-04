@@ -21,7 +21,7 @@ const posts = (await getCollection('blog')).sort(
 
     <section class="md:col-span-3 space-y-8">
       {posts.map((post: CollectionEntry<'blog'>, index: number) => (
-        <ArticleCard post={post} index={index} />
+        <ArticleCard post={post} index={index} theme={index % 2 === 0 ? 'dark' : 'light'} />
       ))}
     </section>
 

@@ -6,19 +6,30 @@ const socialLinks = [
   { href: '#', label: 'LinkedIn' },
 ];
 ---
-<div class="bg-card-dark shadow-metal p-6 w-full">
+<div class="metal-card p-6 w-full">
   <ul class="flex justify-around">
     {socialLinks.map(link => (
       <li>
-        <a 
-          href={link.href} 
-          class="text-text-dark-secondary hover:text-text-dark-primary transition-colors duration-300"
+        <a
+          href={link.href}
+          class="social-link transition-colors duration-300"
           aria-label={link.label}
         >
-          {/* Icon placeholder */}
-          {link.label} 
+          {link.label}
         </a>
       </li>
     ))}
   </ul>
 </div>
+
+<style>
+  div {
+    background-color: #111111;
+  }
+  .social-link {
+    color: #CCCCCC;
+  }
+  .social-link:hover {
+    color: #FFFFFF;
+  }
+</style>

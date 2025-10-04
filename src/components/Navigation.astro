@@ -6,13 +6,13 @@ const navItems = [
   { href: '/archive', label: 'Archive' },
 ];
 ---
-<nav class="bg-card-dark shadow-metal p-6 w-full">
+<nav class="metal-card p-6 w-full">
   <ul class="space-y-4">
     {navItems.map(item => (
       <li>
-        <a 
-          href={item.href} 
-          class="text-text-dark-secondary hover:text-text-dark-primary transition-colors duration-300"
+        <a
+          href={item.href}
+          class="nav-link transition-colors duration-300"
         >
           {item.label}
         </a>
@@ -20,3 +20,15 @@ const navItems = [
     ))}
   </ul>
 </nav>
+
+<style>
+  nav {
+    background-color: #111111;
+  }
+  .nav-link {
+    color: #CCCCCC;
+  }
+  .nav-link:hover {
+    color: #FFFFFF;
+  }
+</style>

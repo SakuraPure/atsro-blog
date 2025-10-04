@@ -2,47 +2,68 @@
 import type { CollectionEntry } from 'astro:content';
 import { formatDate } from '../utils/dates';
 
+type Theme = "light" | "dark";
+
 interface Props {
   post: CollectionEntry<'blog'>;
+  theme?: Theme;
   index: number;
 }
 
-const { post, index } = Astro.props;
-const isEven = index % 2 === 0;
+const { post, theme = "dark", index } = Astro.props;
 
-const cardClasses = isEven 
-  ? 'bg-card-dark text-left' 
-  : 'bg-card-light text-right';
-
-const textClasses = isEven 
-  ? 'text-text-dark-primary' 
-  : 'text-text-light-primary';
-  
-const metaTextClasses = isEven
-  ? 'text-text-dark-secondary'
-  : 'text-text-light-secondary';
+const cardAlignment = theme === 'dark' ? 'text-left' : 'text-right';
 ---
 
 <a
   href={`/blog/${post.slug}/`}
-  class={`block p-8 w-full shadow-metal hover:shadow-metal-hover hover:-translate-y-1 transition-transform duration-300 ${cardClasses} animate-fade-in-up`}
+  class:list={["metal-card", "block p-8 w-full animate-fade-in-up", cardAlignment]}
+  data-theme={theme}
   style={{ animationDelay: `${index * 100}ms`, opacity: 0 }}
   transition:name={`post-${post.slug}`}
 >
   <header>
-    <h2 class={`text-2xl font-bold ${textClasses}`}>{post.data.title}</h2>
-    <p class={`mt-4 ${metaTextClasses}`}>
+    <h2 class="title text-2xl font-bold">{post.data.title}</h2>
+    <p class="meta mt-4">
       <time datetime={post.data.publishDate.toISOString()}>
         {formatDate(post.data.publishDate)}
       </time>
     </p>
   </header>
-  <p class={`mt-4 ${metaTextClasses}`}>{post.data.description}</p>
+  <p class="meta mt-4">{post.data.description}</p>
   <footer class="mt-4">
-    <ul class="flex gap-2" class:list={[ isEven ? 'justify-start' : 'justify-end' ]}>
+    <ul class="flex gap-2" class:list={[ theme === 'dark' ? 'justify-start' : 'justify-end' ]}>
       {post.data.tags.map((tag: string) => (
-        <li class={`text-sm py-1 px-2 ${isEven ? 'bg-white/10' : 'bg-black/10'} ${metaTextClasses}`}>{tag}</li>
+        <li class="tag text-sm py-1 px-2">{tag}</li>
       ))}
     </ul>
   </footer>
 </a>
+
+<style>
+  a[data-theme='dark'] {
+    background-color: #111111;
+  }
+  a[data-theme='dark'] .title {
+    color: #FFFFFF;
+  }
+  a[data-theme='dark'] .meta {
+    color: #CCCCCC;
+  }
+  a[data-theme='dark'] .tag {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  a[data-theme='light'] {
+    background-color: #E5E5E5;
+  }
+  a[data-theme='light'] .title {
+    color: #000000;
+  }
+  a[data-theme='light'] .meta {
+    color: #666666;
+  }
+  a[data-theme='light'] .tag {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+</style>

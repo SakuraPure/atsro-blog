@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "unsplash-mcp-server": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@hellokaton/unsplash-mcp-server",
+        "--key",
+        "63d0f933-7aa2-4f83-9422-0d10629e99af",
+        "--profile",
+        "wild-bandicoot-UJ9Qoq"
+      ]
+    }
+  }
+}
