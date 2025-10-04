@@ -1,0 +1,48 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate } from '../utils/dates';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  index: number;
+}
+
+const { post, index } = Astro.props;
+const isEven = index % 2 === 0;
+
+const cardClasses = isEven 
+  ? 'bg-card-dark text-left' 
+  : 'bg-card-light text-right';
+
+const textClasses = isEven 
+  ? 'text-text-dark-primary' 
+  : 'text-text-light-primary';
+  
+const metaTextClasses = isEven
+  ? 'text-text-dark-secondary'
+  : 'text-text-light-secondary';
+---
+
+<a
+  href={`/blog/${post.slug}/`}
+  class={`block p-8 w-full shadow-metal hover:shadow-metal-hover hover:-translate-y-1 transition-transform duration-300 ${cardClasses} animate-fade-in-up`}
+  style={{ animationDelay: `${index * 100}ms`, opacity: 0 }}
+  transition:name={`post-${post.slug}`}
+>
+  <header>
+    <h2 class={`text-2xl font-bold ${textClasses}`}>{post.data.title}</h2>
+    <p class={`mt-4 ${metaTextClasses}`}>
+      <time datetime={post.data.publishDate.toISOString()}>
+        {formatDate(post.data.publishDate)}
+      </time>
+    </p>
+  </header>
+  <p class={`mt-4 ${metaTextClasses}`}>{post.data.description}</p>
+  <footer class="mt-4">
+    <ul class="flex gap-2" class:list={[ isEven ? 'justify-start' : 'justify-end' ]}>
+      {post.data.tags.map((tag: string) => (
+        <li class={`text-sm py-1 px-2 ${isEven ? 'bg-white/10' : 'bg-black/10'} ${metaTextClasses}`}>{tag}</li>
+      ))}
+    </ul>
+  </footer>
+</a>

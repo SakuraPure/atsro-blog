@@ -1,0 +1,55 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import CloseButton from '../../components/CloseButton.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post: CollectionEntry<'blog'>) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+type Props = {
+  post: CollectionEntry<'blog'>;
+};
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+const isDarkCard = post.data.title.length % 2 === 0; // Simulate alternating style for detail view
+---
+
+<Layout>
+  <article 
+    class:list={[
+      "p-8 md:p-12",
+      isDarkCard ? "bg-card-dark text-text-dark-secondary" : "bg-card-light text-text-light-secondary"
+    ]}
+    transition:name={`post-${post.slug}`}
+  >
+    <header>
+      <h1 class:list={[
+        "text-4xl font-bold",
+        isDarkCard ? "text-text-dark-primary" : "text-text-light-primary"
+      ]}>
+        {post.data.title}
+      </h1>
+      <p class="mt-4">{post.data.description}</p>
+    </header>
+
+    <div class="prose prose-invert mt-8">
+      <Content />
+    </div>
+  </article>
+
+  <CloseButton />
+</Layout>
+
+<script>
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      window.location.href = '/';
+    }
+  });
+</script>

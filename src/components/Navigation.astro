@@ -1,0 +1,22 @@
+---
+// Navigation.astro
+const navItems = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/archive', label: 'Archive' },
+];
+---
+<nav class="bg-card-dark shadow-metal p-6 w-full">
+  <ul class="space-y-4">
+    {navItems.map(item => (
+      <li>
+        <a 
+          href={item.href} 
+          class="text-text-dark-secondary hover:text-text-dark-primary transition-colors duration-300"
+        >
+          {item.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
