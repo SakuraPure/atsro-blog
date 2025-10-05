@@ -16,6 +16,7 @@ type Props = {
 };
 
 const { post } = Astro.props;
+
 const { Content } = await post.render();
 const isDarkCard = post.data.title.length % 2 === 0; // Simulate alternating style for detail view
 ---
@@ -23,27 +24,27 @@ const isDarkCard = post.data.title.length % 2 === 0; // Simulate alternating sty
 <Layout>
   <article 
     class:list={[
-      "p-8 md:p-12",
-      isDarkCard ? "bg-card-dark text-text-dark-secondary" : "bg-card-light text-text-light-secondary"
+      "p-8 md:p-12"
     ]}
-    transition:name={`post-${post.slug}`}
+    transition:name={`post-${Astro.params.slug}`}
+   transition:animate="fade"
   >
-    <header>
-      <h1 class:list={[
-        "text-4xl font-bold",
-        isDarkCard ? "text-text-dark-primary" : "text-text-light-primary"
-      ]}>
-        {post.data.title}
-      </h1>
-      <p class="mt-4">{post.data.description}</p>
-    </header>
-
-    <div class="prose prose-invert mt-8">
-      <Content />
+    <div class="relative prose dark:prose-invert bg-white text-gray-800 p-8 rounded-lg">
+      <CloseButton />
+      <header>
+        <h1 class:list={[
+          "text-4xl font-bold",
+          isDarkCard ? "text-text-dark-primary" : "text-text-light-primary"
+        ]}>
+          {post.data.title}
+        </h1>
+        <p class="mt-4">{post.data.description}</p>
+      </header>
+      <div class="mt-8">
+        <Content />
+      </div>
     </div>
   </article>
-
-  <CloseButton />
 </Layout>
 
 <script>

@@ -21,13 +21,16 @@ const cardAlignment = theme === 'dark' ? 'text-left' : 'text-right';
   data-theme={theme}
   style={{ animationDelay: `${index * 100}ms`, opacity: 0 }}
   transition:name={`post-${post.slug}`}
+ transition:animate="none"
 >
   <header>
     <h2 class="title text-2xl font-bold">{post.data.title}</h2>
     <p class="meta mt-4">
-      <time datetime={post.data.publishDate.toISOString()}>
-        {formatDate(post.data.publishDate)}
-      </time>
+      {post.data.publishDate && !isNaN(post.data.publishDate.getTime()) && (
+        <time datetime={post.data.publishDate.toISOString()}>
+          {formatDate(post.data.publishDate)}
+        </time>
+      )}
     </p>
   </header>
   <p class="meta mt-4">{post.data.description}</p>
