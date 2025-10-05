@@ -41,9 +41,41 @@ const cardAlignment = theme === 'dark' ? 'text-left' : 'text-right';
 </a>
 
 <style>
-  a[data-theme='dark'] {
-    background-color: #111111;
+  .metal-card {
+    position: relative;
+    isolation: isolate;
   }
+
+  .metal-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
+  .metal-card[data-theme='dark'] {
+    background-image: url('/blackmetal.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .metal-card[data-theme='dark']::before {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .metal-card[data-theme='light'] {
+    background-image: url('/white.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .metal-card[data-theme='light']::before {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+
   a[data-theme='dark'] .title {
     color: #FFFFFF;
   }
@@ -54,9 +86,6 @@ const cardAlignment = theme === 'dark' ? 'text-left' : 'text-right';
     background-color: rgba(255, 255, 255, 0.1);
   }
 
-  a[data-theme='light'] {
-    background-color: #E5E5E5;
-  }
   a[data-theme='light'] .title {
     color: #000000;
   }

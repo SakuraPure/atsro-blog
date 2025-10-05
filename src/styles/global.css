@@ -7,7 +7,8 @@
     display: grid;
     place-items: center;
     min-height: 100vh;
-    background-image: url('/src/assets/background.svg');
+    background-color: #1A1A1A;
+    background-image: url('/background.svg');
     background-size: cover;
     background-attachment: fixed;
     position: relative;
@@ -59,6 +60,16 @@
     border-radius: 0px;
     box-shadow: 0 0 1px rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.4);
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    background-color: #111111;
+    /* Subtle brushed metal texture */
+    background-image: linear-gradient(to bottom, transparent 50%, rgba(255, 255, 255, 0.02) 50%);
+    background-size: 100% 2px;
+  }
+
+  .metal-card[data-theme='light'] {
+    background-color: #E5E5E5;
+    /* Subtle brushed metal texture for light theme */
+    background-image: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.03) 50%);
   }
 
   .metal-card:hover {
