@@ -9,6 +9,10 @@ import ArticleCard from '../components/ArticleCard.astro';
 const posts = (await getCollection('blog')).sort(
   (a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
 );
+
+// 分页配置
+const postsPerPage = 3;
+const totalPages = Math.ceil(posts.length / postsPerPage);
 ---
 <Layout>
   <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -20,10 +24,259 @@ const posts = (await getCollection('blog')).sort(
     </aside>
 
     <section class="md:col-span-3 space-y-8">
-      {posts.map((post: CollectionEntry<'blog'>, index: number) => (
-        <ArticleCard post={post} index={index} theme={index % 2 === 0 ? 'dark' : 'light'} />
-      ))}
+      <div id="posts-container" class="space-y-8 pagination-container">
+        {posts.slice(0, postsPerPage).map((post: CollectionEntry<'blog'>, index: number) => (
+          <ArticleCard post={post} index={index} theme={index % 2 === 0 ? 'dark' : 'light'} />
+        ))}
+        
+        {totalPages > 1 && (
+          <div class="pagination-controls">
+            <button id="prev-btn" class="pagination-btn" disabled>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              <span>上一页</span>
+            </button>
+            <span id="page-info" class="page-info">1 / {totalPages}</span>
+            <button id="next-btn" class="pagination-btn">
+              <span>下一页</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+        )}
+      </div>
     </section>
 
   </div>
 </Layout>
+
+<style>
+  .pagination-container {
+    position: relative;
+  }
+
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .pagination-container:hover .pagination-controls {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .pagination-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+  }
+
+  .pagination-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .pagination-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .page-info {
+    color: #FFFFFF;
+    font-size: 0.95rem;
+    font-weight: 500;
+    min-width: 80px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+  }
+</style>
+
+<script define:vars={{ posts, postsPerPage, totalPages }}>
+  // 从 sessionStorage 恢复页码状态，如果不存在则默认为 1
+  let currentPage = parseInt(sessionStorage.getItem('currentPage') || '1', 10);
+
+  function renderPosts() {
+    const container = document.getElementById('posts-container');
+    if (!container) return;
+
+    const start = (currentPage - 1) * postsPerPage;
+    const end = start + postsPerPage;
+    const currentPosts = posts.slice(start, end);
+
+    // 保存当前页码到 sessionStorage
+    sessionStorage.setItem('currentPage', currentPage.toString());
+
+    // 清空容器但保留分页控件
+    const paginationControls = container.querySelector('.pagination-controls');
+    container.innerHTML = '';
+
+    // 渲染文章
+    currentPosts.forEach((post, index) => {
+      const globalIndex = start + index;
+      const theme = globalIndex % 2 === 0 ? 'dark' : 'light';
+      const cardAlignment = theme === 'dark' ? 'text-left' : 'text-right';
+      
+      const article = document.createElement('a');
+      article.href = `/blog/${post.slug}/`;
+      article.className = `metal-card block p-8 w-full animate-fade-in-up ${cardAlignment}`;
+      article.setAttribute('data-theme', theme);
+      
+      // 关键修复：添加背景图片样式
+      if (theme === 'dark') {
+        article.style.backgroundImage = 'url(/blackmetal.jpg)';
+      } else {
+        article.style.backgroundImage = 'url(/white.jpg)';
+      }
+      article.style.backgroundSize = 'cover';
+      article.style.backgroundPosition = 'center';
+      article.style.position = 'relative';
+      article.style.isolation = 'isolate';
+      
+      article.style.animationDelay = `${index * 100}ms`;
+      article.style.opacity = '0';
+
+      const formatDate = (date) => {
+        const d = new Date(date);
+        return d.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+      };
+
+      // 添加伪元素效果的实际 div
+      const overlay = document.createElement('div');
+      overlay.style.position = 'absolute';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.width = '100%';
+      overlay.style.height = '100%';
+      overlay.style.zIndex = '-1';
+      overlay.style.backgroundColor = theme === 'dark' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)';
+
+      // 根据主题设置字体颜色
+      const titleColor = theme === 'dark' ? '#FFFFFF' : '#000000';
+      const metaColor = theme === 'dark' ? '#CCCCCC' : '#666666';
+      const tagBgColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+      
+      article.innerHTML = `
+        <header>
+          <h2 class="title text-2xl font-bold" style="color: ${titleColor};">${post.data.title}</h2>
+          <p class="meta mt-4" style="color: ${metaColor};">
+            <time datetime="${new Date(post.data.publishDate).toISOString()}">
+              ${formatDate(post.data.publishDate)}
+            </time>
+          </p>
+        </header>
+        <p class="meta mt-4" style="color: ${metaColor};">${post.data.description}</p>
+        <footer class="mt-4">
+          <ul class="flex gap-2 ${theme === 'dark' ? 'justify-start' : 'justify-end'}">
+            ${post.data.tags.map(tag => `<li class="tag text-sm py-1 px-2" style="background-color: ${tagBgColor};">${tag}</li>`).join('')}
+          </ul>
+        </footer>
+      `;
+
+      article.insertBefore(overlay, article.firstChild);
+      container.appendChild(article);
+    });
+
+    // 重新添加分页控件
+    if (paginationControls) {
+      container.appendChild(paginationControls);
+    }
+
+    // 更新分页按钮状态
+    updatePaginationControls();
+  }
+
+  function updatePaginationControls() {
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const pageInfo = document.getElementById('page-info');
+
+    if (prevBtn) {
+      prevBtn.disabled = currentPage === 1;
+    }
+
+    if (nextBtn) {
+      nextBtn.disabled = currentPage === totalPages;
+    }
+
+    if (pageInfo) {
+      pageInfo.textContent = `${currentPage} / ${totalPages}`;
+    }
+  }
+
+  function initPagination() {
+    // 如果当前页码超出范围，重置为 1
+    if (currentPage < 1 || currentPage > totalPages) {
+      currentPage = 1;
+      sessionStorage.setItem('currentPage', '1');
+    }
+
+    // 如果不是第一页，则渲染对应的文章
+    if (currentPage !== 1) {
+      renderPosts();
+    }
+
+    // 事件监听器
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderPosts();
+          // 滚动到顶部
+          document.getElementById('posts-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderPosts();
+          // 滚动到顶部
+          document.getElementById('posts-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
+
+    // 初始化分页控件状态
+    updatePaginationControls();
+  }
+
+  // 页面加载时初始化
+  initPagination();
+
+  // 处理 Astro View Transitions - 页面导航后重新初始化
+  document.addEventListener('astro:page-load', () => {
+    initPagination();
+  });
+</script>
